@@ -76,11 +76,6 @@ public class MockController : ControllerBase
         await _context.Translations.AddRangeAsync(translations);
         await _context.SaveChangesAsync();
         
-    
-       
-        
-        
-        
         return Ok(new { Message = "Mock data created successfully!" });
     }
 

@@ -12,43 +12,44 @@ public class TranslationRepo : ITranslationRepo
     {
         _context = context;
     }
-    
+
     public async Task<ICollection<Translation>> GetAll()
     {
         return await _context.Translations.OrderBy(p => p.Id).ToListAsync();
     }
 
+
     public async Task<Translation> GetById(int id)
-    {
-        return await _context.Translations.FirstOrDefaultAsync(p => p.Id == id);
-    }
+        {
+            return await _context.Translations.FirstOrDefaultAsync(p => p.Id == id);
+        }
 
-    public bool TranslationExists(int id)
-    {
-        return _context.Translations.Any(p => p.Id == id);
-    }
+        public bool TranslationExists(int id)
+        {
+            return _context.Translations.Any(p => p.Id == id);
+        }
 
-    public bool CreateTranslation(Translation translation)
-    {
-        _context.Add(translation);
-        return Save();
-    }
+        public bool CreateTranslation(Translation translation)
+        {
+            _context.Add(translation);
+            return Save();
+        }
 
-    public bool UpdateTranslation(Translation translate)
-    {
-        _context.Update(translate);
-        return Save();
-    }
+        public bool UpdateTranslation(Translation translate)
+        {
+            _context.Update(translate);
+            return Save();
+        }
 
-    public bool DeleteTranslation(Translation translation)
-    {
-        _context.Remove(translation);
-        return Save();
-    }
+        public bool DeleteTranslation(Translation translation)
+        {
+            _context.Remove(translation);
+            return Save();
+        }
 
-    public bool Save()
-    {
-        var saved = _context.SaveChanges();
-        return saved > 0 ? true : false;
+        public bool Save()
+        {
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
+        }
     }
-}

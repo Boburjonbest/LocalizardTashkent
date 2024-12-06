@@ -1,5 +1,7 @@
 ﻿using System.Collections;
+
 using System.Diagnostics;
+
 using AutoMapper;
 using Localizard.DAL;
 using Localizard.DAL.Repositories;
@@ -17,12 +19,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Localizard.Controller;
-
 [Route("api/project-detail")]
 [ApiController]
 [Authorize]
 public class ProjectDetailController : ControllerBase
 {
+
     private readonly AppDbContext _context;
     private readonly IProjectDetailRepo _projectDetail;
     private readonly IProjectDetailRepo _projectDetailRepo;
@@ -41,12 +43,14 @@ public class ProjectDetailController : ControllerBase
         _tag = tag;
         _context = context;
         _projectRepo = projectRepo;
+
     }
     
     
     [HttpGet("get-all")]
     public IActionResult GetAllProjectDetails( int projectId, string? Search = null)
     {
+
         var watch = Stopwatch.StartNew();
         
         
@@ -66,12 +70,16 @@ public class ProjectDetailController : ControllerBase
 
 
         var watch3 = Stopwatch.StartNew();
+
+        var projectDetails = _projectDetailRepo.GetAll();
+        
         var data = Array.Empty<object>();
         
         if (!filterDetail.Any())
         {
             return NotFound(data);
         }
+
         Console.WriteLine("detial finding:"+watch3.ElapsedMilliseconds);
     
         var watch4 = Stopwatch.StartNew();
@@ -83,9 +91,8 @@ public class ProjectDetailController : ControllerBase
                 .Where(pd =>
                     (pd.Key != null && pd.Key.IndexOf(Search, StringComparison.OrdinalIgnoreCase) >= 0) || 
                     (pd.Tags != null && pd.Tags.Any(
-                        tag => tag.Name.IndexOf(Search, StringComparison.OrdinalIgnoreCase) >= 0)))
+                        tag => tag.Name.IndexOf(Search, StringComparison.OrdinalIgnoreCase) >= 0))) // Use tag.Name instead
                 .ToList();
-
             return Ok(detailView);
         }
         Console.WriteLine("search filtering:"+watch4.ElapsedMilliseconds);
@@ -93,8 +100,6 @@ public class ProjectDetailController : ControllerBase
         var watch5 = Stopwatch.StartNew();
         var allProjectDetailViews = filterDetail.Select(detail => GetDetailMapper(detail)).ToList();
         Console.WriteLine("mapping:"+watch5.ElapsedMilliseconds);
-        
-        
         return Ok(allProjectDetailViews);
     }
     
@@ -119,20 +124,18 @@ public class ProjectDetailController : ControllerBase
             return BadRequest(ModelState);
 
         var checkDetail =  _projectDetailRepo.GetAll().Select(d => d.Key).Contains(detail.Key);
-        var tags=_tag.GetAllAsync();
+        var tags = _tag.GetAllAsync();
         var validTagIds = tags.Select(t => t.Id).ToList();    
         var invalidTags = detail.TagIds.Except(validTagIds).ToList();
         
         if (invalidTags.Any())
             return BadRequest($"Invalid tag IDs: {string.Join(", ", invalidTags)}");
-
         var project = await _projectRepo.GetById(detail.ProjectInfoId);
 
         if (project is null) return BadRequest();
 
         var LaguageIds = project.Languages.Select(x => x.Id);
         var projectDetail = CraeteDetailMapper(detail, LaguageIds);
-
         foreach (var tag in tags)
         {
             if (projectDetail.Tags is null)
@@ -224,7 +227,8 @@ public class ProjectDetailController : ControllerBase
         return Ok("Successfully updated");
     }
 
-    
+
+   
     [HttpDelete("delete")]
     public IActionResult DeleteProjectDetail(int id)
     {
@@ -245,12 +249,14 @@ public class ProjectDetailController : ControllerBase
             ProjectInfoId = detail.ProjectInfoId,
             Key = detail.Key,
             Description = detail.Description,
+
             AvailableTranslations = detail.Translations,
             Tags = detail.Tags?.Select(tag => new Tag
             {
                 Id = tag.Id,
                 Name = tag.Name
             }).ToList() ?? new List<Tag>(),
+            TagIds = detail.Tags.Select(tag => tag.Id).ToArray()
         };
         
         return detailView;
@@ -258,6 +264,7 @@ public class ProjectDetailController : ControllerBase
     #endregion
     #region CreateDetailMapper
     private ProjectDetail CraeteDetailMapper(CreateProjectDetailView create,IEnumerable<int>  Languages)
+
     {
         ProjectDetail detailView = new ProjectDetail()
         {
@@ -284,11 +291,12 @@ public class ProjectDetailController : ControllerBase
                     detailView.Translations.Add(translation);
                 }
                 
+
             }
         }
 
         return detailView;
     }
     #endregion
-    
+
 }

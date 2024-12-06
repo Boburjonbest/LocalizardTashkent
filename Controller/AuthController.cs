@@ -90,6 +90,7 @@ public class AuthController : ControllerBase
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
         
+
         
         
         return Ok(new { message = "User registered successfully"});

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using AutoMapper;
 using System.Linq;
 using System.Security.Claims;
@@ -38,7 +38,9 @@ public class ProjectController : ControllerBase
     [HttpGet("get-all")]
     public async Task<IActionResult> GetAllProjects([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
+        
         var watch = Stopwatch.StartNew();
+
         var userId = HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userId))
             return Unauthorized();
@@ -65,8 +67,10 @@ public class ProjectController : ControllerBase
         var projectInfoViews = pagedProjects
             .Select(project => ProjectViewMapper(project))
             .ToList();
+
         watch.Stop();
         Console.WriteLine("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa   "+watch.ElapsedMilliseconds);
+
         return Ok(new
         {
             TotalCount = totalProjects,
@@ -138,6 +142,10 @@ public class ProjectController : ControllerBase
     }
 
     [HttpPut("update/{id}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(403)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> UpdateProject(int id, [FromBody] UpdateProjectView update)
     {
         if (update == null)
@@ -153,6 +161,14 @@ public class ProjectController : ControllerBase
 
         if (string.IsNullOrEmpty(userId))
             return Unauthorized();
+        var projectExists = _projectRepo.GetAllProjects().Any(x => x.Name == update.Name && x.Id != id);
+        
+        if (projectExists)
+        {
+            ModelState.AddModelError("", "Project with this name already exists.");
+            return StatusCode(422, ModelState);
+        }
+
         
         existingProject.Name = update.Name; 
         existingProject.LanguageId = update.DefaultLanguageId;

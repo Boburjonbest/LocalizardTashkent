@@ -5,6 +5,7 @@ namespace Localizard.DAL.Repositories.Implementations;
 
 public interface ITranslationRepo
 {
+
     Task<ICollection<Translation>> GetAll();
     Task<Translation> GetById(int id);
     bool TranslationExists(int id);

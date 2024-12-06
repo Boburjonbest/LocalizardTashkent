@@ -32,7 +32,8 @@ public class TranslationController : ControllerBase
         _languageRepo = languageRepo;
     }
 
-    
+
+
     [AllowAnonymous]
     [HttpGet("get-by/{id}")]
     public async Task<IActionResult> GetTranslationById(int id)
@@ -47,7 +48,7 @@ public class TranslationController : ControllerBase
 
         return Ok(translation);
     }
-}
+} 
 
-    
- 
+
+

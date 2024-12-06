@@ -15,6 +15,7 @@ public class ProjectDetail
     public int Id { get; set; }
     public string Key { get; set; }
     public string Description { get; set; }
+
     public int ProjectInfoId { get; set; }
     public int[] TagIds { get; set; } = null!;
     public virtual ICollection<Translation> Translations { get; set; }
@@ -22,6 +23,6 @@ public class ProjectDetail
     public ProjectInfo ProjectInfo { get; set; }
     [JsonIgnore]
     public PlatformEnum PlatformCategories { get; set; }
-    [JsonIgnore] 
+    [JsonIgnore]
     public virtual ICollection<Tag> Tags { get; set; }
 }
